@@ -1,0 +1,22 @@
+# Copy this file to terraform.tfvars and fill in real values.
+# terraform.tfvars is git-ignored and must NEVER be committed with real values.
+
+aws_region   = "us-west-2"
+project_name = "lesson-7"
+
+# Те саме ім'я бакета, що використовувалось у lesson-5/terraform.tfvars
+# (state_bucket_name) — стейт lesson-7 зберігається поруч, з іншим key.
+vpc_state_bucket = "REPLACE-ME-terraform-state-lesson-5"
+vpc_state_key    = "lesson-5/terraform.tfstate"
+
+ecr_repository_name      = "lesson-7-django-app"
+ecr_image_tag_mutability = "MUTABLE"
+ecr_max_image_count      = 10
+
+eks_cluster_name    = "lesson-7-eks"
+eks_cluster_version = "1.30"
+
+node_instance_types = ["t3.medium"]
+node_desired_size   = 2
+node_min_size        = 2
+node_max_size         = 4

@@ -1,0 +1,6 @@
+apiVersion: v2
+name: django-app
+description: Helm chart для Django-застосунку (lesson-7), розгорнутого в EKS з образом із ECR
+type: application
+version: 0.1.0
+appVersion: "1.0.0"

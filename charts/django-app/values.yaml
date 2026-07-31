@@ -1,0 +1,56 @@
+replicaCount: 2
+
+image:
+  # Підстав URL свого ECR-репозиторію (вивід `terraform output ecr_repository_url`
+  # у lesson-7), напр. "123456789012.dkr.ecr.us-west-2.amazonaws.com/lesson-7-django-app"
+  repository: REPLACE-WITH-YOUR-ECR-REPOSITORY-URL
+  tag: latest
+  pullPolicy: IfNotPresent
+
+containerPort: 8000
+
+service:
+  type: LoadBalancer
+  port: 80
+  targetPort: 8000
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 6
+  targetCPUUtilizationPercentage: 70
+
+# Змінні середовища, перенесені з теми 4 (.env / docker-compose.yml).
+# Прокидаються в контейнер через ConfigMap + envFrom.
+# ⚠️ Для навчального завдання секрети (пароль БД, SECRET_KEY) також лежать тут,
+# як цього вимагає завдання. У реальному проєкті DJANGO_SECRET_KEY та
+# POSTGRES_PASSWORD варто виносити в Kubernetes Secret, а не ConfigMap.
+env:
+  DJANGO_SECRET_KEY: "change-me-to-a-random-secret-key"
+  DJANGO_DEBUG: "False"
+  DJANGO_ALLOWED_HOSTS: "*"
+  POSTGRES_DB: "app_db"
+  POSTGRES_USER: "app_user"
+  POSTGRES_PASSWORD: "change-me"
+  # Хост керованої PostgreSQL (наприклад, RDS endpoint). В кластері немає
+  # власної БД — вкажи адресу вже наявного PostgreSQL-сервера.
+  POSTGRES_HOST: "REPLACE-WITH-YOUR-POSTGRES-HOST"
+  POSTGRES_PORT: "5432"
+
+# Бонусне завдання: Ingress + TLS через cert-manager. Вимкнено за замовчуванням.
+ingress:
+  enabled: false
+  className: nginx
+  host: yourdomain.com
+  path: /
+  pathType: Prefix
+  tls: true
+  clusterIssuer: letsencrypt-prod
