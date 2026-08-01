@@ -31,12 +31,12 @@
 # Покрокові команди з поясненнями — у README.md.
 # ==============================================================================
 
-# terraform {
-#   backend "s3" {
-#     bucket         = "REPLACE-WITH-YOUR-STATE-BUCKET-NAME"
-#     key            = "lesson-5/terraform.tfstate"
-#     region         = "us-west-2"
-#     dynamodb_table = "terraform-state-lock"
-#     encrypt        = true
-#   }
-# }
+terraform {
+  backend "s3" {
+    bucket         = "terraform-state-lesson-5-430383499929"
+    key            = "lesson-5/terraform.tfstate"
+    region         = "us-west-2"
+    dynamodb_table = "terraform-state-lock"
+    encrypt        = true
+  }
+}
