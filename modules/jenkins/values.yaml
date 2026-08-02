@@ -1,0 +1,47 @@
+# Helm-значення для jenkinsci/jenkins. Рендериться через templatefile() у
+# jenkins.tf — плейсхолдери ${service_type} підставляються Terraform'ом.
+#
+# Пода агента з контейнерами kaniko+git тут НЕ описується: він визначається
+# інлайново в кореневому Jenkinsfile (agent { kubernetes { yaml ... } }), тож
+# дефолтний "jenkins-agent" pod template цього чарта вимкнено (agent.enabled:
+# false) — Kubernetes Cloud (авто-налаштований чартом in-cluster) сам створює
+# потрібні поди за specs із Jenkinsfile.
+
+controller:
+  serviceType: "${service_type}"
+
+  resources:
+    requests:
+      cpu: "500m"
+      memory: "1Gi"
+    limits:
+      cpu: "1"
+      memory: "2Gi"
+
+  # Без пінінгу конкретних версій — update center сам підбере версії,
+  # сумісні з ядром Jenkins цього чарта (пінговані версії з першої спроби
+  # виявились новішими, ніж підтримує 2.462.3-jdk17, і init-контейнер падав
+  # у CrashLoopBackOff на "requires a greater version of Jenkins").
+  installPlugins:
+    - kubernetes
+    - workflow-aggregator
+    - git
+    - configuration-as-code
+    - credentials-binding
+    - kubernetes-credentials-provider
+
+persistence:
+  enabled: true
+  size: "8Gi"
+  # Кластер lesson-7 не має адрес-класу за замовчуванням (ebs-csi-driver
+  # addon не встановлений) — тут явно вказуємо наявний in-tree StorageClass
+  # "gp2", інакше PVC лишається Pending.
+  storageClass: "gp2"
+
+# Дефолтний pod template цього чарта нам не потрібен — власний, з kaniko+git,
+# оголошується у Jenkinsfile через `agent { kubernetes { yaml ... } }`.
+agent:
+  enabled: false
+
+rbac:
+  create: true

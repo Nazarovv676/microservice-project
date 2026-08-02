@@ -24,7 +24,7 @@ output "node_role_arn" {
 }
 
 output "oidc_provider_arn" {
-  description = "ARN of the cluster's IAM OIDC provider (для IRSA-ролей інших модулів, напр. Jenkins/Kaniko у lesson-8-9)"
+  description = "ARN of the cluster's IAM OIDC provider (для IRSA-ролей інших модулів, напр. Jenkins/Kaniko)"
   value       = aws_iam_openid_connect_provider.eks.arn
 }
 

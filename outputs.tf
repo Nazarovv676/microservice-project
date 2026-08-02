@@ -55,16 +55,46 @@ output "eks_cluster_certificate_authority_data" {
 }
 
 output "eks_oidc_provider_arn" {
-  description = "ARN of the cluster's IAM OIDC provider (для IRSA-ролей у lesson-8-9)"
+  description = "ARN of the cluster's IAM OIDC provider"
   value       = module.eks.oidc_provider_arn
-}
-
-output "eks_oidc_provider_host" {
-  description = "OIDC issuer host без схеми https://"
-  value       = module.eks.oidc_provider_host
 }
 
 output "configure_kubectl" {
   description = "Команда для налаштування kubectl-доступу до кластера"
   value       = "aws eks update-kubeconfig --region ${var.aws_region} --name ${module.eks.cluster_name}"
+}
+
+output "jenkins_namespace" {
+  description = "Namespace, у якому встановлено Jenkins"
+  value       = module.jenkins.namespace
+}
+
+output "jenkins_get_admin_password" {
+  description = "Команда для отримання початкового пароля admin (chart сам генерує Secret)"
+  value       = "kubectl -n ${module.jenkins.namespace} exec -it svc/${module.jenkins.release_name} -c jenkins -- cat /run/secrets/additional/chart-admin-password"
+}
+
+output "jenkins_port_forward" {
+  description = "Команда для доступу до Jenkins UI без публічного LoadBalancer"
+  value       = "kubectl -n ${module.jenkins.namespace} port-forward svc/${module.jenkins.release_name} 8080:8080"
+}
+
+output "kaniko_iam_role_arn" {
+  description = "ARN IAM-ролі, яку через IRSA використовує ServiceAccount kaniko для push в ECR"
+  value       = module.jenkins.kaniko_role_arn
+}
+
+output "argocd_namespace" {
+  description = "Namespace, у якому встановлено Argo CD"
+  value       = module.argo_cd.namespace
+}
+
+output "argocd_get_admin_password" {
+  description = "Команда для отримання початкового пароля admin (стандартний Secret чарта argo-cd)"
+  value       = "kubectl -n ${module.argo_cd.namespace} get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d"
+}
+
+output "argocd_port_forward" {
+  description = "Команда для доступу до Argo CD UI без публічного LoadBalancer"
+  value       = "kubectl -n ${module.argo_cd.namespace} port-forward svc/${module.argo_cd.release_name}-server 8081:443"
 }

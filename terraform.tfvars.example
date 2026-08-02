@@ -4,9 +4,8 @@
 aws_region   = "us-west-2"
 project_name = "lesson-7"
 
-# Глобально унікальне ім'я S3-бакета для стану (наприклад, з суфіксом
-# твого AWS account ID) — заповнюється один раз і лишається тим самим для
-# всіх наступних уроків (lesson-8-9 і далі), бо це той самий проєкт.
+# Глобально унікальне ім'я S3-бакета для стану. Якщо вже застосовував(-ла)
+# гілку lesson-7 — підстав те саме ім'я бакета, це той самий стейт.
 state_bucket_name     = "REPLACE-ME-terraform-state-bucket-name"
 state_lock_table_name = "terraform-state-lock"
 
@@ -28,3 +27,24 @@ node_instance_types = ["t3.medium"]
 node_desired_size   = 2
 node_min_size       = 2
 node_max_size       = 4
+
+github_owner = "Nazarovv676"
+github_repo  = "microservice-project"
+
+# Personal Access Token зі scope "repo" — потрібен Jenkins (git push у
+# lesson-8-9) і Argo CD (клонування репозиторію). Створюється в GitHub →
+# Settings → Developer settings → Personal access tokens.
+github_username = "REPLACE-ME-github-username"
+github_pat      = "REPLACE-ME-github-pat"
+
+app_chart_path      = "charts/django-app"
+app_target_revision = "lesson-8-9"
+app_namespace       = "default"
+
+jenkins_namespace     = "jenkins"
+jenkins_chart_version = "5.9.45"
+jenkins_service_type  = "LoadBalancer"
+
+argocd_namespace           = "argocd"
+argocd_chart_version       = "7.7.11"
+argocd_server_service_type = "LoadBalancer"

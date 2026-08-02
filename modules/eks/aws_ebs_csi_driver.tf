@@ -1,11 +1,11 @@
 # EKS маршрутизує навіть "in-tree" StorageClass'и (provisioner
 # kubernetes.io/aws-ebs) через CSI-міграцію на ebs.csi.aws.com — без цього
 # addon'а жоден PersistentVolumeClaim у кластері не забіндиться (перевірено
-# наживо: Jenkins-under lesson-8-9 висів Pending, поки цього addon'а не було).
+# наживо: Jenkins висів Pending, поки цього addon'а не було).
 #
 # OIDC provider реєструється тут (а не в модулі jenkins) — AWS дозволяє лише
 # один IAM OIDC provider на issuer URL кластера, тож усі IRSA-ролі (і ebs-csi,
-# і майбутній kaniko з lesson-8-9) використовують один і той самий provider,
+# і kaniko з модуля jenkins) використовують один і той самий provider,
 # зареєстрований разом з кластером.
 
 data "tls_certificate" "eks_oidc" {

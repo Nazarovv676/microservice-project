@@ -1,0 +1,31 @@
+{{- range .Values.applications }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ .name }}
+  namespace: {{ $.Release.Namespace }}
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+
+  source:
+    repoURL: {{ .repoURL | quote }}
+    targetRevision: {{ .targetRevision | quote }}
+    path: {{ .path }}
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: {{ .destinationNamespace }}
+
+  # Автоматична синхронізація: щойно Jenkins пушить новий тег у
+  # charts/django-app/values.yaml на main, Argo CD сам підхоплює й
+  # застосовує зміну (без ручного "Sync" у UI). selfHeal повертає кластер
+  # до стану з Git, якщо хтось змінить ресурси вручну через kubectl.
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+{{- end }}

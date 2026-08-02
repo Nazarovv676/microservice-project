@@ -50,3 +50,54 @@ module "eks" {
   node_min_size       = var.node_min_size
   node_max_size       = var.node_max_size
 }
+
+# Короткоживучий токен для доступу kubernetes/helm-провайдерів до кластера —
+# без залежності від локального ~/.kube/config (див. providers.tf).
+data "aws_eks_cluster_auth" "this" {
+  name = module.eks.cluster_name
+}
+
+module "jenkins" {
+  source = "./modules/jenkins"
+
+  project_name  = var.project_name
+  namespace     = var.jenkins_namespace
+  chart_version = var.jenkins_chart_version
+  service_type  = var.jenkins_service_type
+
+  oidc_provider_arn  = module.eks.oidc_provider_arn
+  oidc_provider_host = module.eks.oidc_provider_host
+  ecr_repository_arn = module.ecr.repository_arn
+  ecr_repository_url = module.ecr.repository_url
+
+  github_owner    = var.github_owner
+  github_repo     = var.github_repo
+  github_username = var.github_username
+  github_pat      = var.github_pat
+
+  # Явна залежність від усього модуля eks (не лише від використаних output'ів)
+  # — Jenkins-у потрібен готовий aws-ebs-csi-driver addon (з aws_ebs_csi_driver.tf)
+  # для власного PVC, а посилання лише на oidc_provider_* цього не гарантує.
+  depends_on = [module.eks]
+}
+
+module "argo_cd" {
+  source = "./modules/argo_cd"
+
+  project_name  = var.project_name
+  namespace     = var.argocd_namespace
+  chart_version = var.argocd_chart_version
+  service_type  = var.argocd_server_service_type
+
+  github_owner    = var.github_owner
+  github_repo     = var.github_repo
+  github_username = var.github_username
+  github_pat      = var.github_pat
+
+  app_name            = "django-app"
+  app_chart_path      = var.app_chart_path
+  app_target_revision = var.app_target_revision
+  app_destination_ns  = var.app_namespace
+
+  depends_on = [module.eks]
+}

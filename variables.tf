@@ -120,3 +120,93 @@ variable "node_max_size" {
   type        = number
   default     = 4
 }
+
+# ------------------------------------------------------------------------------
+# GitHub-репозиторій із застосунком і Helm-чартом (монорепо: Jenkins оновлює
+# charts/django-app/values.yaml і пушить у гілку цього ж репозиторію; Argo CD
+# теж стежить за ним).
+# ------------------------------------------------------------------------------
+
+variable "github_owner" {
+  description = "Власник (org/user) GitHub-репозиторію"
+  type        = string
+}
+
+variable "github_repo" {
+  description = "Назва GitHub-репозиторію (без .git)"
+  type        = string
+}
+
+variable "app_chart_path" {
+  description = "Шлях до Helm-чарта застосунку всередині репозиторію"
+  type        = string
+  default     = "charts/django-app"
+}
+
+variable "app_target_revision" {
+  description = "Гілка/тег, за якою стежить Argo CD Application. У цьому репозиторії кожен урок живе на власній гілці (main ніколи не мержиться), тому за замовчуванням це lesson-8-9, а не main"
+  type        = string
+  default     = "lesson-8-9"
+}
+
+variable "app_namespace" {
+  description = "Namespace, у який Argo CD синхронізує django-app"
+  type        = string
+  default     = "default"
+}
+
+variable "github_username" {
+  description = "GitHub username для push у main і (за потреби) для приватного клонування репозиторію Argo CD"
+  type        = string
+  sensitive   = true
+}
+
+variable "github_pat" {
+  description = "GitHub Personal Access Token з правом push у репозиторій (scope: repo). Ніколи не комітиться — лише в terraform.tfvars, який у .gitignore"
+  type        = string
+  sensitive   = true
+}
+
+# ------------------------------------------------------------------------------
+# Jenkins
+# ------------------------------------------------------------------------------
+
+variable "jenkins_namespace" {
+  description = "Kubernetes namespace для Jenkins"
+  type        = string
+  default     = "jenkins"
+}
+
+variable "jenkins_chart_version" {
+  description = "Версія Helm-чарта jenkinsci/jenkins (5.7.5 бандлить застарілий Jenkins 2.462.3, з яким сучасні релізи плагінів вже несумісні — 5.9.x тягне 2.568.1)"
+  type        = string
+  default     = "5.9.45"
+}
+
+variable "jenkins_service_type" {
+  description = "Тип Service для Jenkins controller (LoadBalancer, ClusterIP, ...)"
+  type        = string
+  default     = "LoadBalancer"
+}
+
+# ------------------------------------------------------------------------------
+# Argo CD
+# ------------------------------------------------------------------------------
+
+variable "argocd_namespace" {
+  description = "Kubernetes namespace для Argo CD"
+  type        = string
+  default     = "argocd"
+}
+
+variable "argocd_chart_version" {
+  description = "Версія Helm-чарта argo/argo-cd"
+  type        = string
+  default     = "7.7.11"
+}
+
+variable "argocd_server_service_type" {
+  description = "Тип Service для Argo CD server (LoadBalancer, ClusterIP, ...)"
+  type        = string
+  default     = "LoadBalancer"
+}

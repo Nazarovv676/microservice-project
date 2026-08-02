@@ -1,0 +1,39 @@
+# Helm-значення для argo/argo-cd. Рендериться через templatefile() у
+# argo_cd.tf — плейсхолдер ${service_type} підставляється Terraform'ом.
+
+server:
+  service:
+    type: "${service_type}"
+
+  resources:
+    requests:
+      cpu: "250m"
+      memory: "256Mi"
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+
+controller:
+  resources:
+    requests:
+      cpu: "250m"
+      memory: "512Mi"
+    limits:
+      cpu: "500m"
+      memory: "1Gi"
+
+repoServer:
+  resources:
+    requests:
+      cpu: "250m"
+      memory: "256Mi"
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+
+# Учнівське завдання — стандартний self-signed сертифікат чарта достатній,
+# окремий TLS/Ingress для Argo CD тут не піднімається (як і бонусний Ingress
+# у lesson-7, доступ через LoadBalancer/port-forward).
+configs:
+  params:
+    server.insecure: false

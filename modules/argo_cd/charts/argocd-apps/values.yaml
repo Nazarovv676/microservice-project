@@ -1,0 +1,15 @@
+# Значення за замовчуванням — реальні підставляються модулем argo_cd
+# (argo_cd.tf, helm_release "argocd_apps") зі значень Terraform-змінних.
+
+applications:
+  - name: django-app
+    repoURL: "REPLACE-WITH-YOUR-GITHUB-REPO-URL"
+    path: charts/django-app
+    targetRevision: main
+    destinationNamespace: default
+
+repository:
+  name: django-app-repo
+  url: "REPLACE-WITH-YOUR-GITHUB-REPO-URL"
+  username: ""
+  password: ""
