@@ -81,6 +81,39 @@ module "jenkins" {
   depends_on = [module.eks]
 }
 
+module "rds" {
+  source = "./modules/rds"
+
+  project_name = var.project_name
+  identifier   = var.rds_identifier
+
+  vpc_id     = module.vpc.vpc_id
+  subnet_ids = module.vpc.private_subnet_ids
+
+  # Доступ до БД лише з worker-нод EKS (де живуть pod'и Django), без
+  # публічної адреси і без відкриття по CIDR.
+  allowed_security_group_ids = [module.eks.cluster_security_group_id]
+
+  use_aurora             = var.rds_use_aurora
+  engine                 = var.rds_engine
+  engine_version         = var.rds_engine_version
+  parameter_group_family = var.rds_parameter_group_family
+  instance_class         = var.rds_instance_class
+
+  allocated_storage = var.rds_allocated_storage
+  multi_az          = var.rds_multi_az
+
+  aurora_instance_count = var.rds_aurora_instance_count
+
+  db_name         = var.rds_db_name
+  master_username = var.rds_master_username
+
+  deletion_protection = var.rds_deletion_protection
+  skip_final_snapshot = var.rds_skip_final_snapshot
+
+  depends_on = [module.eks]
+}
+
 module "argo_cd" {
   source = "./modules/argo_cd"
 

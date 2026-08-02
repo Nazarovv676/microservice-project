@@ -48,3 +48,22 @@ jenkins_service_type  = "LoadBalancer"
 argocd_namespace           = "argocd"
 argocd_chart_version       = "7.7.11"
 argocd_server_service_type = "LoadBalancer"
+
+# RDS: залиш use_aurora = false для звичайної RDS-інстанції (дешевше для
+# навчання), постав true — щоб отримати Aurora-кластер. Дивись
+# modules/rds/README.md за повним описом усіх rds_* змінних.
+rds_identifier      = "django-db"
+rds_use_aurora      = false
+rds_engine          = "postgres"
+rds_engine_version  = "16.4"
+# aurora-режим вимагає іншу родину parameter group:
+# rds_parameter_group_family = "aurora-postgresql16"
+rds_parameter_group_family = "postgres16"
+rds_instance_class         = "db.t3.medium"
+rds_allocated_storage      = 20
+rds_multi_az                = false
+rds_aurora_instance_count  = 1
+rds_db_name                 = "django_app"
+rds_master_username        = "app_admin"
+rds_deletion_protection    = false
+rds_skip_final_snapshot    = true

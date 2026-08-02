@@ -11,9 +11,15 @@ S3-бакет/DynamoDB, той самий `key`), а не створює пар�
 інфраструктуру. Тому весь Terraform-код живе в **одному місці** — корені
 репозиторію, — а не розбитий по папках `lesson-N/`.
 
-Ця гілка (`lesson-8-9`) додає до lesson-7 повний CI/CD-конвеєр: **Jenkins**
-(Kaniko + git Kubernetes-агент) збирає Docker-образ, пушить у ECR і оновлює
-Helm-чарт; **Argo CD** підхоплює зміну і автоматично синхронізує кластер.
+Ця гілка (`lesson-db-module`) додає до lesson-8-9 модуль `modules/rds` —
+гнучку базу даних застосунку: звичайну RDS-інстанцію АБО Aurora-кластер,
+перемикається одним прапорцем `rds_use_aurora`. Детальний опис змінних,
+виводів і прикладів — у [`modules/rds/README.md`](modules/rds/README.md).
+
+Гілка `lesson-8-9`, з якої виросла ця, додала до lesson-7 повний
+CI/CD-конвеєр: **Jenkins** (Kaniko + git Kubernetes-агент) збирає
+Docker-образ, пушить у ECR і оновлює Helm-чарт; **Argo CD** підхоплює зміну і
+автоматично синхронізує кластер.
 
 ```
 git push (Dockerfile/код)
@@ -51,8 +57,9 @@ git push (Dockerfile/код)
 │   ├── eks/                    # EKS-кластер + node group + addons
 │   │   └── aws_ebs_csi_driver.tf   # IAM OIDC provider (IRSA) + EBS CSI driver addon
 │   ├── jenkins/                # helm_release "jenkins" + IRSA-роль kaniko + RBAC
-│   └── argo_cd/                 # helm_release "argocd" + Application/repository (app-of-apps чарт)
-│       └── charts/argocd-apps/
+│   ├── argo_cd/                 # helm_release "argocd" + Application/repository (app-of-apps чарт)
+│   │   └── charts/argocd-apps/
+│   └── rds/                    # Універсальна RDS-інстанція АБО Aurora-кластер (use_aurora) — modules/rds/README.md
 │
 ├── charts/django-app/          # Helm-чарт Django-застосунку (image.tag оновлює CI)
 ├── Jenkinsfile                  # Kubernetes-агент (kaniko + git), кроки збірки/пушу
@@ -123,8 +130,15 @@ terraform apply
 ```
 
 Це створить VPC, ECR, EKS-кластер (з addon `aws-ebs-csi-driver`), Jenkins
-(Helm-реліз + IRSA-роль `kaniko` + RBAC) і Argo CD (Helm-реліз + `Application`
-для `charts/django-app`).
+(Helm-реліз + IRSA-роль `kaniko` + RBAC), Argo CD (Helm-реліз + `Application`
+для `charts/django-app`) і RDS/Aurora (`modules/rds`, режим — `rds_use_aurora`
+у `terraform.tfvars`).
+
+```bash
+terraform output rds_endpoint
+terraform output rds_master_user_secret_arn   # ARN у Secrets Manager (пароль сам згенерував AWS)
+aws secretsmanager get-secret-value --secret-id "$(terraform output -raw rds_master_user_secret_arn)" --query SecretString --output text
+```
 
 ```bash
 aws eks update-kubeconfig --region us-west-2 --name lesson-7-eks

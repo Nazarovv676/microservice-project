@@ -210,3 +210,86 @@ variable "argocd_server_service_type" {
   type        = string
   default     = "LoadBalancer"
 }
+
+# ------------------------------------------------------------------------------
+# RDS (universal module: звичайна RDS-інстанція або Aurora-кластер, залежно
+# від rds_use_aurora — див. modules/rds/README.md)
+# ------------------------------------------------------------------------------
+
+variable "rds_identifier" {
+  description = "Базовий identifier для ресурсів БД (subnet group, security group, instance/cluster)"
+  type        = string
+  default     = "django-db"
+}
+
+variable "rds_use_aurora" {
+  description = "true — Aurora-кластер (writer + readers), false — звичайна одиночна RDS-інстанція"
+  type        = bool
+  default     = false
+}
+
+variable "rds_engine" {
+  description = "Сімейство БД: \"postgres\" або \"mysql\""
+  type        = string
+  default     = "postgres"
+}
+
+variable "rds_engine_version" {
+  description = "Версія engine"
+  type        = string
+  default     = "16.4"
+}
+
+variable "rds_parameter_group_family" {
+  description = "Родина parameter group; має відповідати rds_engine + rds_use_aurora (напр. postgres16 vs aurora-postgresql16)"
+  type        = string
+  default     = "postgres16"
+}
+
+variable "rds_instance_class" {
+  description = "Клас інстансу БД"
+  type        = string
+  default     = "db.t3.medium"
+}
+
+variable "rds_allocated_storage" {
+  description = "Розмір сховища в GiB (тільки для звичайної RDS-інстанції)"
+  type        = number
+  default     = 20
+}
+
+variable "rds_multi_az" {
+  description = "Multi-AZ standby для звичайної RDS-інстанції"
+  type        = bool
+  default     = false
+}
+
+variable "rds_aurora_instance_count" {
+  description = "Кількість instance'ів в Aurora-кластері (перший — writer, решта — readers)"
+  type        = number
+  default     = 1
+}
+
+variable "rds_db_name" {
+  description = "Назва бази даних Django-застосунку"
+  type        = string
+  default     = "django_app"
+}
+
+variable "rds_master_username" {
+  description = "Master username адміністратора БД"
+  type        = string
+  default     = "app_admin"
+}
+
+variable "rds_deletion_protection" {
+  description = "Захист БД від випадкового видалення"
+  type        = bool
+  default     = false
+}
+
+variable "rds_skip_final_snapshot" {
+  description = "Пропустити фінальний снапшот при видаленні БД"
+  type        = bool
+  default     = true
+}

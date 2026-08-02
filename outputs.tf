@@ -89,6 +89,36 @@ output "kaniko_iam_role_arn" {
   value       = module.jenkins.kaniko_role_arn
 }
 
+output "rds_endpoint" {
+  description = "Endpoint для запису (writer) — host бази даних, без порту"
+  value       = module.rds.endpoint
+}
+
+output "rds_reader_endpoint" {
+  description = "Endpoint для читання (заповнений лише коли rds_use_aurora = true)"
+  value       = module.rds.reader_endpoint
+}
+
+output "rds_port" {
+  description = "Порт бази даних"
+  value       = module.rds.port
+}
+
+output "rds_db_name" {
+  description = "Назва бази даних"
+  value       = module.rds.db_name
+}
+
+output "rds_master_user_secret_arn" {
+  description = "ARN секрету в Secrets Manager з паролем адміністратора БД"
+  value       = module.rds.master_user_secret_arn
+}
+
+output "rds_security_group_id" {
+  description = "ID security group бази даних"
+  value       = module.rds.security_group_id
+}
+
 output "argocd_namespace" {
   description = "Namespace, у якому встановлено Argo CD"
   value       = module.argo_cd.namespace
