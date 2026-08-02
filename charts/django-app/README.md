@@ -1,6 +1,6 @@
 # django-app Helm chart
 
-Розгортає Django-застосунок (образ з ECR, див. [lesson-7](../../lesson-7/README.md))
+Розгортає Django-застосунок (образ з ECR, див. [README.md](../../README.md))
 у Kubernetes.
 
 ## Ресурси чарта

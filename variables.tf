@@ -11,19 +11,52 @@ variable "project_name" {
 }
 
 # ------------------------------------------------------------------------------
-# Мережа (VPC) з lesson-5 — кластер розгортається у ВЖЕ ІСНУЮЧІЙ мережі,
-# тому тут немає модуля vpc, лише посилання на віддалений стейт lesson-5.
+# S3 backend (state + lock)
 # ------------------------------------------------------------------------------
 
-variable "vpc_state_bucket" {
-  description = "Назва S3-бакета зі стейтом lesson-5 (те саме значення, що і state_bucket_name у lesson-5/terraform.tfvars)"
+variable "state_bucket_name" {
+  description = "Globally unique S3 bucket name for Terraform remote state"
   type        = string
 }
 
-variable "vpc_state_key" {
-  description = "Key стейту lesson-5 у S3-бакеті"
+variable "state_lock_table_name" {
+  description = "DynamoDB table name for Terraform state locking"
   type        = string
-  default     = "lesson-5/terraform.tfstate"
+  default     = "terraform-state-lock"
+}
+
+# ------------------------------------------------------------------------------
+# VPC
+# ------------------------------------------------------------------------------
+
+variable "vpc_cidr" {
+  description = "CIDR block for the VPC"
+  type        = string
+  default     = "10.0.0.0/16"
+}
+
+variable "availability_zones" {
+  description = "Availability zones to deploy subnets into"
+  type        = list(string)
+  default     = ["us-west-2a", "us-west-2b", "us-west-2c"]
+}
+
+variable "public_subnet_cidrs" {
+  description = "CIDR blocks for public subnets (one per AZ, same order as availability_zones)"
+  type        = list(string)
+  default     = ["10.0.0.0/24", "10.0.1.0/24", "10.0.2.0/24"]
+}
+
+variable "private_subnet_cidrs" {
+  description = "CIDR blocks for private subnets (one per AZ, same order as availability_zones)"
+  type        = list(string)
+  default     = ["10.0.10.0/24", "10.0.11.0/24", "10.0.12.0/24"]
+}
+
+variable "single_nat_gateway" {
+  description = "Use a single shared NAT Gateway for all private subnets instead of one per AZ (cost saving vs. high-availability trade-off)"
+  type        = bool
+  default     = true
 }
 
 # ------------------------------------------------------------------------------

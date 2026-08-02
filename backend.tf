@@ -9,7 +9,7 @@
 # Тому розгортання виконується у ДВА КРОКИ:
 #
 #   КРОК 1 — bootstrap (локальний стейт):
-#     1. Переконайся, що блок `backend "s3" {}` нижче ЗАКОМЕНТОВАНО (як зараз).
+#     1. Переконайся, що блок `backend "s3" {}` нижче ЗАКОМЕНТОВАНО.
 #     2. terraform init
 #     3. terraform apply -target=module.s3_backend
 #        (створює S3-бакет + DynamoDB-таблицю; стейт лежить локально у файлі
@@ -28,13 +28,18 @@
 #        мігровано) і видали/заархівуй локальний terraform.tfstate* — надалі
 #        джерело істини лежить у S3.
 #
+# Це ОДИН раз виконаний bootstrap на весь проєкт — наступні уроки (lesson-8-9
+# і далі) використовують той самий бакет і той самий key ("terraform.tfstate"),
+# бо це один і той самий стейт, що просто розростається новими модулями, а не
+# паралельні незалежні стеки.
+#
 # Покрокові команди з поясненнями — у README.md.
 # ==============================================================================
 
 terraform {
   backend "s3" {
-    bucket         = "terraform-state-lesson-5-430383499929"
-    key            = "lesson-5/terraform.tfstate"
+    bucket         = "REPLACE-WITH-YOUR-STATE-BUCKET-NAME"
+    key            = "terraform.tfstate"
     region         = "us-west-2"
     dynamodb_table = "terraform-state-lock"
     encrypt        = true

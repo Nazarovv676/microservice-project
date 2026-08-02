@@ -22,3 +22,13 @@ output "node_role_arn" {
   description = "ARN of the IAM role used by worker nodes"
   value       = aws_iam_role.node.arn
 }
+
+output "oidc_provider_arn" {
+  description = "ARN of the cluster's IAM OIDC provider (для IRSA-ролей інших модулів, напр. Jenkins/Kaniko у lesson-8-9)"
+  value       = aws_iam_openid_connect_provider.eks.arn
+}
+
+output "oidc_provider_host" {
+  description = "OIDC issuer host без схеми https:// (для умов sub/aud у trust policy IRSA-ролей)"
+  value       = local.oidc_provider_host
+}

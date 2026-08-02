@@ -4,3 +4,46 @@ __pycache__/
 db.sqlite3
 venv/
 staticfiles/
+
+# ------------------------------------------------------------------------------
+# Terraform
+# ------------------------------------------------------------------------------
+
+# Local .terraform directories
+**/.terraform/*
+
+# Terraform state files
+*.tfstate
+*.tfstate.*
+
+# tfvars may contain sensitive/environment-specific data
+*.tfvars
+*.tfvars.json
+!*.tfvars.example
+
+# Crash log files
+crash.log
+crash.*.log
+
+# Keys/certs
+*.pem
+
+# AWS credentials, if ever copied locally into the project
+.aws/
+
+# Terraform plan output files
+*.tfplan
+*.tfplan.*
+
+# Override files (local-only overrides, should never be committed)
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# CLI configuration files
+.terraformrc
+terraform.rc
+
+# NOTE: .terraform.lock.hcl is intentionally NOT ignored — it should be
+# committed to pin provider versions across machines/CI.

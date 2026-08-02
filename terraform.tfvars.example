@@ -1,0 +1,30 @@
+# Copy this file to terraform.tfvars and fill in real values.
+# terraform.tfvars is git-ignored and must NEVER be committed with real values.
+
+aws_region   = "us-west-2"
+project_name = "lesson-7"
+
+# Глобально унікальне ім'я S3-бакета для стану (наприклад, з суфіксом
+# твого AWS account ID) — заповнюється один раз і лишається тим самим для
+# всіх наступних уроків (lesson-8-9 і далі), бо це той самий проєкт.
+state_bucket_name     = "REPLACE-ME-terraform-state-bucket-name"
+state_lock_table_name = "terraform-state-lock"
+
+vpc_cidr             = "10.0.0.0/16"
+availability_zones   = ["us-west-2a", "us-west-2b", "us-west-2c"]
+public_subnet_cidrs  = ["10.0.0.0/24", "10.0.1.0/24", "10.0.2.0/24"]
+private_subnet_cidrs = ["10.0.10.0/24", "10.0.11.0/24", "10.0.12.0/24"]
+
+single_nat_gateway = true
+
+ecr_repository_name      = "lesson-7-django-app"
+ecr_image_tag_mutability = "MUTABLE"
+ecr_max_image_count      = 10
+
+eks_cluster_name    = "lesson-7-eks"
+eks_cluster_version = "1.30"
+
+node_instance_types = ["t3.medium"]
+node_desired_size   = 2
+node_min_size       = 2
+node_max_size       = 4
