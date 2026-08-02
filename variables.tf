@@ -92,9 +92,9 @@ variable "eks_cluster_name" {
 }
 
 variable "eks_cluster_version" {
-  description = "Kubernetes version for the EKS control plane"
+  description = "Kubernetes version for the EKS control plane (1.30 dropped out of AWS support entirely; keep this within STANDARD_SUPPORT — check `aws eks describe-cluster-versions`)"
   type        = string
-  default     = "1.30"
+  default     = "1.34"
 }
 
 variable "node_instance_types" {
