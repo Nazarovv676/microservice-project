@@ -1,0 +1,94 @@
+# Helm-значення для prometheus-community/kube-prometheus-stack. Рендериться
+# через templatefile() у monitoring.tf — плейсхолдери підставляються
+# Terraform'ом.
+#
+# Чарт бандлить Prometheus Operator + Prometheus + Alertmanager +
+# kube-state-metrics + prometheus-node-exporter + Grafana (з дефолтними
+# дашбордами кластера) в одному релізі — саме тому для навчального проєкту
+# обрано його, а не окремі чарти на кожен компонент.
+
+prometheus:
+  prometheusSpec:
+    retention: "${prometheus_retention}"
+
+    resources:
+      requests:
+        cpu: "250m"
+        memory: "512Mi"
+      limits:
+        cpu: "500m"
+        memory: "1Gi"
+
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: "${storage_class}"
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: "${prometheus_storage_size}"
+
+alertmanager:
+  alertmanagerSpec:
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "128Mi"
+      limits:
+        cpu: "100m"
+        memory: "256Mi"
+
+    storage:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: "${storage_class}"
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: "1Gi"
+
+grafana:
+  service:
+    type: "${grafana_service_type}"
+
+%{ if grafana_admin_password != "" }
+  adminPassword: "${grafana_admin_password}"
+%{ endif }
+
+  persistence:
+    enabled: true
+    storageClassName: "${storage_class}"
+    size: "${grafana_storage_size}"
+
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "200m"
+      memory: "256Mi"
+
+  # Дефолтні дашборди kube-prometheus-stack (ноди, поди, Kubernetes API,
+  # тощо) — достатньо для навчального проєкту, без кастомних JSON-дашбордів.
+  defaultDashboardsEnabled: true
+
+kubeStateMetrics:
+  enabled: true
+
+nodeExporter:
+  enabled: true
+
+# Дефолтний node group (t3.medium, 2-4 ноди) невеликий — вимикаємо
+# компоненти control plane, недоступні на EKS (control plane керується AWS,
+# ETCD/scheduler/controller-manager метрики звідти не збираються).
+kubeEtcd:
+  enabled: false
+
+kubeControllerManager:
+  enabled: false
+
+kubeScheduler:
+  enabled: false
+
+kubeProxy:
+  enabled: false

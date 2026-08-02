@@ -134,3 +134,22 @@ module "argo_cd" {
 
   depends_on = [module.eks]
 }
+
+module "monitoring" {
+  source = "./modules/monitoring"
+
+  project_name  = var.project_name
+  namespace     = var.monitoring_namespace
+  chart_version = var.monitoring_chart_version
+
+  grafana_service_type    = var.grafana_service_type
+  grafana_admin_password  = var.grafana_admin_password
+  storage_class           = var.monitoring_storage_class
+  prometheus_retention    = var.prometheus_retention
+  prometheus_storage_size = var.prometheus_storage_size
+  grafana_storage_size    = var.grafana_storage_size
+
+  # metrics-server (для HPA) — окремий addon в modules/eks; kube-prometheus-stack
+  # додає повноцінний моніторинг (Prometheus + Grafana), незалежний від нього.
+  depends_on = [module.eks]
+}

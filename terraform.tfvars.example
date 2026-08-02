@@ -49,6 +49,17 @@ argocd_namespace           = "argocd"
 argocd_chart_version       = "7.7.11"
 argocd_server_service_type = "LoadBalancer"
 
+monitoring_namespace     = "monitoring"
+monitoring_chart_version = "88.0.1"
+grafana_service_type     = "LoadBalancer"
+# Порожній рядок — чарт сам генерує пароль admin (kubectl get secret, дивись
+# terraform output grafana_get_admin_password).
+grafana_admin_password   = ""
+monitoring_storage_class = "gp2"
+prometheus_retention     = "5d"
+prometheus_storage_size  = "10Gi"
+grafana_storage_size     = "2Gi"
+
 # RDS: залиш use_aurora = false для звичайної RDS-інстанції (дешевше для
 # навчання), постав true — щоб отримати Aurora-кластер. Дивись
 # modules/rds/README.md за повним описом усіх rds_* змінних.

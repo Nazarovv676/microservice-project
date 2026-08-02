@@ -59,7 +59,8 @@ git push (Dockerfile/код)
 │   ├── jenkins/                # helm_release "jenkins" + IRSA-роль kaniko + RBAC
 │   ├── argo_cd/                 # helm_release "argocd" + Application/repository (app-of-apps чарт)
 │   │   └── charts/argocd-apps/
-│   └── rds/                    # Універсальна RDS-інстанція АБО Aurora-кластер (use_aurora) — modules/rds/README.md
+│   ├── rds/                    # Універсальна RDS-інстанція АБО Aurora-кластер (use_aurora) — modules/rds/README.md
+│   └── monitoring/              # helm_release "kube-prometheus-stack" (Prometheus + Alertmanager + Grafana)
 │
 ├── charts/django-app/          # Helm-чарт Django-застосунку (image.tag оновлює CI)
 ├── Jenkinsfile                  # Kubernetes-агент (kaniko + git), кроки збірки/пушу
@@ -129,10 +130,12 @@ terraform init -migrate-state
 terraform apply
 ```
 
-Це створить VPC, ECR, EKS-кластер (з addon `aws-ebs-csi-driver`), Jenkins
-(Helm-реліз + IRSA-роль `kaniko` + RBAC), Argo CD (Helm-реліз + `Application`
-для `charts/django-app`) і RDS/Aurora (`modules/rds`, режим — `rds_use_aurora`
-у `terraform.tfvars`).
+Це створить VPC, ECR, EKS-кластер (з addon `aws-ebs-csi-driver` і
+`metrics-server`), Jenkins (Helm-реліз + IRSA-роль `kaniko` + RBAC), Argo CD
+(Helm-реліз + `Application` для `charts/django-app`), RDS/Aurora
+(`modules/rds`, режим — `rds_use_aurora` у `terraform.tfvars`) і
+Prometheus/Grafana (`modules/monitoring`, helm-чарт
+`prometheus-community/kube-prometheus-stack`).
 
 ```bash
 terraform output rds_endpoint
@@ -179,13 +182,40 @@ kubectl -n argocd get svc argocd-server
 kubectl -n default get deployment django-app-django-app -o jsonpath='{.spec.template.spec.containers[0].image}'
 ```
 
+## Крок 5 — Моніторинг: Prometheus + Grafana
+
+Автомасштабування Pod'ів застосунку — `charts/django-app/templates/hpa.yaml`
+(`HorizontalPodAutoscaler`), який читає CPU/RAM метрики з addon'у
+`metrics-server` (`modules/eks/eks.tf`). Окремо від нього
+`modules/monitoring` піднімає повноцінний стек спостережності —
+Prometheus Operator + Prometheus + Alertmanager + kube-state-metrics +
+node-exporter + Grafana (з дефолтними дашбордами кластера) — одним Helm-
+релізом `kube-prometheus-stack`.
+
+```bash
+kubectl get all -n monitoring
+terraform output grafana_get_admin_password
+kubectl -n monitoring port-forward svc/kube-prometheus-stack-grafana 3000:80
+```
+
+Grafana UI: `http://localhost:3000`, логін `admin` + пароль з кроку вище.
+Дашборди **Kubernetes / Compute Resources / Cluster** і **Node Exporter /
+Nodes** доступні одразу після синку — окремо їх імпортувати не треба.
+
+Prometheus UI (перевірка таргетів/алертів):
+
+```bash
+kubectl -n monitoring port-forward svc/kube-prometheus-stack-prometheus 9090:9090
+```
+
 ---
 
 ## ⚠️ Платні ресурси — не забудь прибрати
 
 - EKS control plane, EC2-ноди node group.
-- Jenkins/Argo CD `LoadBalancer` Service — по одному AWS ELB на кожен.
-- Jenkins `persistence` (EBS-том, 8Gi).
+- Jenkins/Argo CD/Grafana `LoadBalancer` Service — по одному AWS ELB на кожен.
+- Jenkins `persistence` (EBS-том, 8Gi), Prometheus (10Gi) + Grafana (2Gi) +
+  Alertmanager (1Gi) — усі PVC з `modules/monitoring`.
 
 ```bash
 terraform destroy

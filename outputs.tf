@@ -138,3 +138,23 @@ output "argocd_port_forward" {
   description = "Команда для доступу до Argo CD UI без публічного LoadBalancer"
   value       = "kubectl -n ${module.argo_cd.namespace} port-forward svc/${module.argo_cd.release_name}-server 8081:443"
 }
+
+output "monitoring_namespace" {
+  description = "Namespace, у якому встановлено Prometheus/Grafana"
+  value       = module.monitoring.namespace
+}
+
+output "grafana_get_admin_password" {
+  description = "Команда для отримання пароля admin Grafana (якщо grafana_admin_password не задано — чарт сам генерує Secret)"
+  value       = "kubectl -n ${module.monitoring.namespace} get secret ${module.monitoring.grafana_service_name} -o jsonpath='{.data.admin-password}' | base64 -d"
+}
+
+output "grafana_port_forward" {
+  description = "Команда для доступу до Grafana UI без публічного LoadBalancer"
+  value       = "kubectl -n ${module.monitoring.namespace} port-forward svc/${module.monitoring.grafana_service_name} 3000:80"
+}
+
+output "prometheus_port_forward" {
+  description = "Команда для доступу до Prometheus UI без публічного LoadBalancer"
+  value       = "kubectl -n ${module.monitoring.namespace} port-forward svc/${module.monitoring.release_name}-prometheus 9090:9090"
+}
