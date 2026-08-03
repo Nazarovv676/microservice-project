@@ -29,6 +29,8 @@ controller:
     - configuration-as-code
     - credentials-binding
     - kubernetes-credentials-provider
+    # Потрібен для cleanWs() у post-блоці кореневого Jenkinsfile.
+    - ws-cleanup
 
 persistence:
   enabled: true
