@@ -69,9 +69,14 @@ output "jenkins_namespace" {
   value       = module.jenkins.namespace
 }
 
+output "jenkins_url" {
+  description = "Command to get Jenkins UI URL"
+  value       = "kubectl -n ${module.jenkins.namespace} get svc ${module.jenkins.release_name} -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'"
+}
+
 output "jenkins_get_admin_password" {
-  description = "Команда для отримання початкового пароля admin (chart сам генерує Secret)"
-  value       = "kubectl -n ${module.jenkins.namespace} exec -it svc/${module.jenkins.release_name} -c jenkins -- cat /run/secrets/additional/chart-admin-password"
+  description = "Command to retrieve the initial Jenkins admin password"
+  value       = "kubectl -n ${module.jenkins.namespace} get secret ${module.jenkins.release_name} -o jsonpath='{.data.jenkins-admin-password}' | base64 -d"
 }
 
 output "jenkins_port_forward" {
@@ -89,8 +94,13 @@ output "argocd_namespace" {
   value       = module.argo_cd.namespace
 }
 
+output "argocd_url" {
+  description = "Command to get Argo CD UI URL"
+  value       = "kubectl -n ${module.argo_cd.namespace} get svc ${module.argo_cd.release_name}-server -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'"
+}
+
 output "argocd_get_admin_password" {
-  description = "Команда для отримання початкового пароля admin (стандартний Secret чарта argo-cd)"
+  description = "Command to retrieve the initial Argo CD admin password"
   value       = "kubectl -n ${module.argo_cd.namespace} get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d"
 }
 

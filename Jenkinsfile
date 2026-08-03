@@ -121,5 +121,8 @@ spec:
         success {
             echo "Pushed ${params.ECR_REPOSITORY_URL}:${IMAGE_TAG} and bumped charts/django-app/values.yaml on ${params.GIT_TARGET_BRANCH} — Argo CD will pick it up automatically."
         }
+        always {
+            cleanWs()
+        }
     }
 }
