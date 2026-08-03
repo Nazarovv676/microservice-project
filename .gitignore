@@ -34,6 +34,11 @@ crash.*.log
 # Terraform plan output files
 *.tfplan
 *.tfplan.*
+tfplan
+tfplan-*
+
+# terraform apply/output logs saved locally while debugging
+apply_*.log
 
 # Override files (local-only overrides, should never be committed)
 override.tf
