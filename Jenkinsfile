@@ -23,6 +23,18 @@ spec:
       image: gcr.io/kaniko-project/executor:debug
       command: ["sleep"]
       args: ["9999"]
+      env:
+        # Kaniko автентифікується в ECR через вбудований AWS SDK credential
+        # chain (IRSA-токен ServiceAccount "kaniko"), але сам SDK не може
+        # визначити регіон — IMDS усередині пода недоступний (hop-limit),
+        # тож без явного AWS_REGION запит GetAuthorizationToken падає з
+        # auth error ще до звернення до STS. AWS_STS_REGIONAL_ENDPOINTS
+        # додатково гарантує використання регіонального STS-ендпоінта
+        # замість глобального (надійніше для AssumeRoleWithWebIdentity).
+        - name: AWS_REGION
+          value: "us-west-2"
+        - name: AWS_STS_REGIONAL_ENDPOINTS
+          value: "regional"
     - name: git-tools
       image: alpine/git:latest
       command: ["sleep"]

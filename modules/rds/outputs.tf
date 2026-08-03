@@ -32,6 +32,25 @@ output "master_user_secret_arn" {
   ) : null
 }
 
+# Реальний пароль у відкритому вигляді — потрібен, щоб кореневий модуль міг
+# автоматично підставити POSTGRES_PASSWORD у charts/django-app/values.yaml
+# (див. values.yaml.tpl + django_app.tf), без ручного копіювання з Secrets
+# Manager. Коли manage_master_user_password = true, читаємо значення з того ж
+# секрету, ARN якого повертає master_user_secret_arn вище.
+data "aws_secretsmanager_secret_version" "master_password" {
+  count = var.manage_master_user_password ? 1 : 0
+
+  secret_id = var.use_aurora ? aws_rds_cluster.this[0].master_user_secret[0].secret_arn : aws_db_instance.this[0].master_user_secret[0].secret_arn
+}
+
+output "master_password" {
+  description = "Пароль адміністратора БД у відкритому вигляді (з Secrets Manager коли manage_master_user_password = true, інакше з var.master_password)"
+  value = var.manage_master_user_password ? (
+    jsondecode(data.aws_secretsmanager_secret_version.master_password[0].secret_string)["password"]
+  ) : var.master_password
+  sensitive = true
+}
+
 output "security_group_id" {
   description = "ID security group бази даних"
   value       = aws_security_group.this.id

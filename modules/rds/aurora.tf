@@ -13,6 +13,9 @@ resource "aws_rds_cluster_parameter_group" "this" {
     content {
       name  = parameter.value.name
       value = parameter.value.value
+      # Той самий фікс, що й у rds.tf: "immediate" падає на static-параметрах
+      # (напр. max_connections) з InvalidParameterCombination.
+      apply_method = "pending-reboot"
     }
   }
 

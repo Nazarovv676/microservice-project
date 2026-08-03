@@ -13,6 +13,11 @@ resource "aws_db_parameter_group" "this" {
     content {
       name  = parameter.value.name
       value = parameter.value.value
+      # "immediate" (провайдерівський дефолт) падає на static-параметрах
+      # (напр. max_connections) з InvalidParameterCombination. Для щойно
+      # створеної групи всі значення однаково застосовуються ще до першого
+      # запуску instance'а, тож pending-reboot тут ні на що не впливає.
+      apply_method = "pending-reboot"
     }
   }
 

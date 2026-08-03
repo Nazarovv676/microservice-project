@@ -73,9 +73,9 @@ variable "engine" {
 }
 
 variable "engine_version" {
-  description = "Версія engine (напр. \"16.4\" для postgres, \"8.0.mysql_aurora.3.08.0\" для aurora-mysql тощо)"
+  description = "Версія engine (напр. \"16.10\" для postgres, \"8.0.mysql_aurora.3.08.0\" для aurora-mysql тощо)"
   type        = string
-  default     = "16.4"
+  default     = "16.10"
 }
 
 variable "parameter_group_family" {

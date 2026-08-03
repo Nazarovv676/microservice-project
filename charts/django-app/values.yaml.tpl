@@ -37,14 +37,14 @@ env:
   DJANGO_SECRET_KEY: "change-me-to-a-random-secret-key"
   DJANGO_DEBUG: "False"
   DJANGO_ALLOWED_HOSTS: "*"
-  POSTGRES_DB: "django_app"
-  POSTGRES_USER: "app_admin"
-  POSTGRES_PASSWORD: "xAi0JIs03F)|V>x.W8YqV-smSaaT"
+  POSTGRES_DB: "${postgres_db}"
+  POSTGRES_USER: "${postgres_user}"
+  POSTGRES_PASSWORD: "${postgres_password}"
   # Реальний RDS endpoint/порт підставляє Terraform (django_app.tf) з
   # виводів module.rds — вручну редагувати values.yaml не потрібно, він
   # перегенеровується при кожному `terraform apply`.
-  POSTGRES_HOST: "lesson-7-django-db.cvkakcwwgosp.us-west-2.rds.amazonaws.com"
-  POSTGRES_PORT: "5432"
+  POSTGRES_HOST: "${postgres_host}"
+  POSTGRES_PORT: "${postgres_port}"
 
 # Бонусне завдання: Ingress + TLS через cert-manager. Вимкнено за замовчуванням.
 ingress:

@@ -66,7 +66,7 @@ grafana_storage_size     = "2Gi"
 rds_identifier      = "django-db"
 rds_use_aurora      = false
 rds_engine          = "postgres"
-rds_engine_version  = "16.4"
+rds_engine_version  = "16.10"
 # aurora-режим вимагає іншу родину parameter group:
 # rds_parameter_group_family = "aurora-postgresql16"
 rds_parameter_group_family = "postgres16"

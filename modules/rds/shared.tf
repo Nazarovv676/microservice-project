@@ -51,15 +51,19 @@ resource "aws_security_group" "this" {
 }
 
 resource "aws_security_group_rule" "ingress_security_groups" {
-  for_each = toset(var.allowed_security_group_ids)
+  # count замість for_each: значення allowed_security_group_ids (напр.
+  # module.eks.cluster_security_group_id) невідомі до apply при розгортанні
+  # з нуля, а for_each вимагає відомих ключів вже на етапі plan. count
+  # потребує лише довжину списку, яка відома завжди.
+  count = length(var.allowed_security_group_ids)
 
   type                     = "ingress"
   from_port                = local.port
   to_port                  = local.port
   protocol                 = "tcp"
   security_group_id        = aws_security_group.this.id
-  source_security_group_id = each.value
-  description              = "DB access from security group ${each.value}"
+  source_security_group_id = var.allowed_security_group_ids[count.index]
+  description              = "DB access from security group ${var.allowed_security_group_ids[count.index]}"
 }
 
 resource "aws_security_group_rule" "ingress_cidr_blocks" {

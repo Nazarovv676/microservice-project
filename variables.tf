@@ -290,7 +290,7 @@ variable "rds_engine" {
 variable "rds_engine_version" {
   description = "Версія engine"
   type        = string
-  default     = "16.4"
+  default     = "16.10"
 }
 
 variable "rds_parameter_group_family" {
