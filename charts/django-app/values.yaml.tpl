@@ -4,7 +4,7 @@ image:
   # Підстав URL свого ECR-репозиторію (вивід `terraform output ecr_repository_url`
   # у lesson-7), напр. "123456789012.dkr.ecr.us-west-2.amazonaws.com/lesson-7-django-app"
   repository: 430383499929.dkr.ecr.us-west-2.amazonaws.com/lesson-7-django-app
-  tag: 2-87e89b9
+  tag: 3-a1d2849
   pullPolicy: IfNotPresent
 
 containerPort: 8000
